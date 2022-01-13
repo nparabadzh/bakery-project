@@ -18,14 +18,6 @@ type User struct {
 	Modified        time.Time `json:"modified_at"`
 }
 
-type UserToken struct {
-	UserID    int    `json:"id"`
-	FirstName string `json:"first-name"`
-	LastName  string `json:"last-name"`
-	Email     string `json:"email"`
-	jwt.StandardClaims
-}
-
 type UserLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -67,4 +59,16 @@ type OrderedGoods struct {
 	ID      int64 `json:"id"`
 	GoodID  int64 `json:"good_id"`
 	OrderID int64 `json:"order_id"`
+}
+
+type UserToken struct {
+	UserID          int       `json:"id"`
+	FirstName       string    `json:"first-name"`
+	LastName        string    `json:"last-name"`
+	Email           string    `json:"email"`
+	DeliveryAddress string    `json:"delivery_address"`
+	IsAdmin         bool      `json:"is_admin"`
+	Created         time.Time `json:"created_at"`
+	Modified        time.Time `json:"modified_at"`
+	jwt.StandardClaims
 }

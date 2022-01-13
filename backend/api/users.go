@@ -98,8 +98,9 @@ func NewUserRepoMysql(user, password, dbname string) *UserRepoMysql {
 
 func (u UserRepoMysql) FindByEmail(email string) (*entities.User, error) {
 	user := &entities.User{}
-	statement := "SELECT id, email, first_name, last_name, password FROM users WHERE email=?"
-	err := u.db.QueryRow(statement, email).Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Password)
+	statement := "SELECT id, first_name, last_name, username, password, delivery_address, isAdmin, created, modified FROM users WHERE email=?"
+	err := u.db.QueryRow(statement, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username,
+		&user.Password, &user.DeliveryAddress, &user.IsAdmin, &user.Created, &user.Modified)
 	if err != nil {
 		return nil, err
 	}

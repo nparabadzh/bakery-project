@@ -80,7 +80,7 @@ func (a *App) Shutdown(ctx context.Context) error {
 func (a *App) initializeRoutes() {
 	// User routes
 	a.Router.HandleFunc("/users", a.getUsers).Methods("GET")
-	a.Router.HandleFunc("/users", a.createUser).Methods("POST")
+	a.Router.HandleFunc("/signUp", a.createUser).Methods("POST")
 	a.Router.HandleFunc("/users/{id:[0-9]+}", a.getUser).Methods("GET")
 	a.Router.HandleFunc("/users/{id:[0-9]+}", a.updateUser).Methods("PUT")
 	a.Router.HandleFunc("/users/{id:[0-9]+}", a.deleteUser).Methods("DELETE")
@@ -156,10 +156,14 @@ func (a *App) checkEmailPassword(w http.ResponseWriter, email, password string) 
 	}
 
 	claims := &entities.UserToken{
-		UserID:    int(user.ID),
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
+		UserID:          int(user.ID),
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Email:           user.Email,
+		DeliveryAddress: user.DeliveryAddress,
+		IsAdmin:         user.IsAdmin,
+		Created:         user.Created,
+		Modified:        user.Modified,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiresAt,
 			Issuer:    "test",

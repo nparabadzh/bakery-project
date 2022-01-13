@@ -43,9 +43,23 @@ func (u *BakedGoodsRepoMySql) FindByID(id int) (*entities.BakedGood, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	statement = "SELECT tagId from bakedGoodsTags WHERE bakedGoodId = ?"
-	err = u.db.QueryRow(statement, bakedGood.ID).Scan(&bakedGood.TagsIds)
+	rows, err := u.db.Query(statement, bakedGood.ID)
 	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var tagId int
+		err := rows.Scan(&tagId)
+		if err != nil {
+			return nil, err
+		}
+		bakedGood.TagsIds = append(bakedGood.TagsIds, int64(tagId))
+	}
+	rows.Close()
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 	return bakedGood, nil
