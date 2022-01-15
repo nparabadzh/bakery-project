@@ -14,7 +14,7 @@ import CakeIcon from '@material-ui/icons/Cake';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 
 import { setCurrentUser } from '../redux/user/actions';
-import { toggleCartHidden } from '../redux/cart/actions';
+import { clearCart, toggleCartHidden } from '../redux/cart/actions';
 import { selectCartItemsCount } from '../redux/cart/selectors';
 import CartDropdown from '../components/Cart/CartDropdown';
 
@@ -91,6 +91,7 @@ export default function PrimarySearchAppBar() {
 
   const signOut = () => {
     dispatch(setCurrentUser(null));
+    dispatch(clearCart());
   };
 
   const toggleCart = () => {
