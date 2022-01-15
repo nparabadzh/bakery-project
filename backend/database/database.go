@@ -68,22 +68,57 @@ func main() {
 	}
 	log.Printf("Connected to DB %s successfully\n", dbname)
 
-	// Insert baked goods
-
-	bakedGoods := []entities.BakedGood{
-		{Name: "Chocolate cake"},
-		{Name: "Red velvet cake"},
-		{Name: "Cheesecake"},
-		{Name: "Profiteroles"},
+	//Insert categories
+	categories := []entities.Category{
+		{CategoryName: "Cakes"},
+		{CategoryName: "Pies"},
+		{CategoryName: "Tarts"},
+		{CategoryName: "Cheesecakes"},
+		{CategoryName: "Pastries"},
+		{CategoryName: "Other"},
 	}
-	stmt, err := db.Prepare("INSERT INTO bakedGoods(name) VALUES( ? )")
+
+	stmt, err := db.Prepare("INSERT INTO categories(category_name) VALUES( ? )")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close() // Prepared statements take up server resources and should be closed after use.
+
+	for i, c := range categories {
+		res, err := stmt.Exec(c.CategoryName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		numRows, err := res.RowsAffected()
+		if err != nil || numRows != 1 {
+			log.Fatal("Error inserting new Category", err)
+		}
+		insId, err := res.LastInsertId()
+		if err != nil {
+			log.Fatal(err)
+		}
+		categories[i].ID = int(insId)
+	}
+
+	// Insert baked goods
+	bakedGoods := []entities.BakedGood{
+		{Name: "Chocolate cake", Price: 12.4,
+			PhotoUrl: "backend/images/chocolate-cake.jpeg", CategoryId: 4},
+		{Name: "Red velvet cake", Price: 20,
+			PhotoUrl: "backend/images/red-velvet-cake.jpeg", CategoryId: 4},
+		{Name: "Cheesecake", Price: 15.3,
+			PhotoUrl: "backend/images/cheesecake.jpeg", CategoryId: 7},
+		{Name: "Profiteroles", Price: 7.2,
+			PhotoUrl: "backend/images/profiteroles.jpeg", CategoryId: 8},
+	}
+	stmt, err = db.Prepare("INSERT INTO bakedGoods(name, price, photo_url, category_id) VALUES( ?,?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close() // Prepared statements take up server resources and should be closed after use.
 
 	for i, c := range bakedGoods {
-		res, err := stmt.Exec(c.Name)
+		res, err := stmt.Exec(c.Name, c.Price, c.PhotoUrl, c.CategoryId)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -100,15 +135,15 @@ func main() {
 
 	// Insert users
 	users := []entities.User{
-		{Email: "linus@linux.com", FirstName: "Linus", LastName: "Torvalds", Username: "linus", Password: "linus", DeliveryAddress: "Sofia,Reduta", IsAdmin: true},
-		{Email: "gosling@java.com", FirstName: "James", LastName: "Gosling", Username: "james", Password: "james", DeliveryAddress: "Oborishte", IsAdmin: false},
-		{Email: "pike@golang.com", FirstName: "Rob", LastName: "Pike", Username: "rob", Password: "rob", DeliveryAddress: "Varna", IsAdmin: false},
-		{Email: "kamel@docker.com", FirstName: "Kamel", LastName: "Founadi", Username: "kamel", Password: "kamel", DeliveryAddress: "Lulin", IsAdmin: false},
+		{Email: "admin@admin.com", FirstName: "Admin", LastName: "Admin", Password: "admin", DeliveryAddress: "Sofia,Reduta", IsAdmin: true},
+		{Email: "user@user.com", FirstName: "Default", LastName: "User", Password: "password", DeliveryAddress: "Oborishte"},
+		{Email: "pike@golang.com", FirstName: "Rob", LastName: "Pike", Password: "rob", DeliveryAddress: "Varna"},
+		{Email: "kamel@docker.com", FirstName: "Kamel", LastName: "Founadi", Password: "kamel", DeliveryAddress: "Lulin"},
 	}
 
 	stmt, err = db.Prepare(
-		`INSERT INTO users(email, first_name, last_name, username, password, delivery_address, isAdmin, created, modified) 
-		VALUES( ?, ?, ?, ?, ?, ?, ?, ?,?)`)
+		`INSERT INTO users(email, first_name, last_name, password, delivery_address, isAdmin, created, modified) 
+		VALUES( ?, ?, ?, ?, ?, ?, ?,?)`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -122,8 +157,8 @@ func main() {
 			panic(err)
 		}
 		users[i].Password = "{bcrypt}" + string(hashedPassword)
-		result, err := stmt.Exec(users[i].Email, users[i].FirstName, users[i].LastName, users[i].Username,
-			users[i].Password, users[i].DeliveryAddress, users[i].IsAdmin, users[i].Created, users[i].Modified)
+		result, err := stmt.Exec(users[i].Email, users[i].FirstName, users[i].LastName, users[i].Password,
+			users[i].DeliveryAddress, users[i].IsAdmin, users[i].Created, users[i].Modified)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -140,7 +175,7 @@ func main() {
 }
 
 func dropDbs(db *sql.DB) {
-	res, err := db.Exec("DROP TABLE IF EXISTS `review`")
+	res, err := db.Exec("DROP TABLE IF EXISTS `reviews`")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -182,6 +217,13 @@ func dropDbs(db *sql.DB) {
 	rowsAffected, err = res.RowsAffected()
 	log.Printf("bakedgoods - Rows Affected: %d %v", rowsAffected, err)
 
+	res, err = db.Exec("DROP TABLE IF EXISTS `categories`")
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowsAffected, err = res.RowsAffected()
+	log.Printf("'categories' - Rows Affected: %d %v", rowsAffected, err)
+
 	res, err = db.Exec("DROP TABLE IF EXISTS `users`")
 	if err != nil {
 		log.Fatal(err)
@@ -192,52 +234,59 @@ func dropDbs(db *sql.DB) {
 }
 
 func createDbs(db *sql.DB) {
-	res, err := db.Exec("CREATE TABLE `users` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `email` varchar(255) DEFAULT NULL, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL, `username` varchar(30) DEFAULT NULL, `password` varchar(255) DEFAULT NULL, `delivery_address` varchar(255) DEFAULT NULL, `isAdmin` tinyint(1) DEFAULT 0, `created` datetime(6) DEFAULT NULL, `modified` datetime(6) DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`), UNIQUE KEY `UK_r43af9ap4edm43mmtq01oddj6` (`username`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
+	res, err := db.Exec("CREATE TABLE `users` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `email` varchar(255) DEFAULT NULL, `first_name` varchar(255) DEFAULT NULL, `last_name` varchar(255) DEFAULT NULL, `password` varchar(255) DEFAULT NULL, `delivery_address` varchar(255) DEFAULT NULL, `isAdmin` tinyint(1) DEFAULT 0, `created` datetime(6) DEFAULT NULL, `modified` datetime(6) DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}
 	rowsAffected, err := res.RowsAffected()
-	log.Printf("'companies' - Rows Affected: %d %v", rowsAffected, err)
+	log.Printf("'USERS' - Rows Affected: %d %v", rowsAffected, err)
 
-	res, err = db.Exec("CREATE TABLE `bakedGoods` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(255) DEFAULT NULL, `photoUrl` varchar(255), `price` double DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
+	res, err = db.Exec("CREATE TABLE `categories` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `category_name` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}
 	rowsAffected, err = res.RowsAffected()
-	log.Printf("'projects' - Rows Affected: %d %v", rowsAffected, err)
+	log.Printf("'category' - Rows Affected: %d %v", rowsAffected, err)
+
+	res, err = db.Exec("CREATE TABLE `bakedGoods` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(255) DEFAULT NULL, `photo_url` varchar(255), `price` double DEFAULT NULL, `category_id` bigint(20), PRIMARY KEY (`id`), FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowsAffected, err = res.RowsAffected()
+	log.Printf("'BAKED GOODS' - Rows Affected: %d %v", rowsAffected, err)
 
 	res, err = db.Exec("CREATE TABLE `tags` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `tagName` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}
 	rowsAffected, err = res.RowsAffected()
-	log.Printf("'users' - Rows Affected: %d %v", rowsAffected, err)
+	log.Printf("'TAGS' - Rows Affected: %d %v", rowsAffected, err)
 
 	res, err = db.Exec("CREATE TABLE `bakedGoodsTags` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `tagId` bigint(20) DEFAULT NULL, `bakedGoodId` bigint(20) DEFAULT NULL, PRIMARY KEY (`id`), FOREIGN KEY (`tagId`) REFERENCES `tags` (`id`), FOREIGN KEY (`bakedGoodId`) REFERENCES `bakedGoods` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}
 	rowsAffected, err = res.RowsAffected()
-	log.Printf("user_roles - Rows Affected: %d %v", rowsAffected, err)
+	log.Printf("BAKED GOODS TAGS - Rows Affected: %d %v", rowsAffected, err)
 
 	res, err = db.Exec("CREATE TABLE `orders` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`userId` bigint(20) DEFAULT NULL,`status` varchar(50) DEFAULT NULL,`deliveryAddress` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`),FOREIGN KEY (`userId`) REFERENCES `users` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}
 	rowsAffected, err = res.RowsAffected()
-	log.Printf("user_roles - Rows Affected: %d %v", rowsAffected, err)
+	log.Printf("ORDERS - Rows Affected: %d %v", rowsAffected, err)
 
 	res, err = db.Exec("CREATE TABLE `orderedGoods` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`bakedGoodId` bigint(20) DEFAULT NULL,`orderId` bigint(20) DEFAULT NULL,PRIMARY KEY (`id`),FOREIGN KEY (`bakedGoodId`) REFERENCES `bakedGoods` (`id`),FOREIGN KEY (`orderId`) REFERENCES `orders` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}
 	rowsAffected, err = res.RowsAffected()
-	log.Printf("user_roles - Rows Affected: %d %v", rowsAffected, err)
+	log.Printf("ORDERED GOODS - Rows Affected: %d %v", rowsAffected, err)
 
-	res, err = db.Exec("CREATE TABLE `review` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`userId` bigint(20) DEFAULT NULL,`reviewText` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`),FOREIGN KEY (`userId`) REFERENCES `users` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
+	res, err = db.Exec("CREATE TABLE `reviews` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`userId` bigint(20) DEFAULT NULL,`reviewText` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`),FOREIGN KEY (`userId`) REFERENCES `users` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}
 	rowsAffected, err = res.RowsAffected()
-	log.Printf("user_roles - Rows Affected: %d %v", rowsAffected, err)
+	log.Printf("REVIEW - Rows Affected: %d %v", rowsAffected, err)
 }

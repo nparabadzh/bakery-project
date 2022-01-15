@@ -10,7 +10,6 @@ type User struct {
 	Email           string    `json:"email"`
 	FirstName       string    `json:"first_name"`
 	LastName        string    `json:"last_name"`
-	Username        string    `json:"username"`
 	Password        string    `json:"password"`
 	DeliveryAddress string    `json:"delivery_address"`
 	IsAdmin         bool      `json:"is_admin"`
@@ -24,11 +23,17 @@ type UserLogin struct {
 }
 
 type BakedGood struct {
-	ID       int64   `json:"id"`
-	Name     string  `json:"name"`
-	PhotoUrl []byte  `json:"photo"`
-	Price    float64 `json:"price"`
-	TagsIds  []int64 `json:"tags_ids"`
+	ID         int64   `json:"id"`
+	Name       string  `json:"name"`
+	PhotoUrl   string  `json:"photo"`
+	Price      float64 `json:"price"`
+	TagsIds    []int64 `json:"tags_ids"`
+	CategoryId int     `json:"category_id""`
+}
+
+type Category struct {
+	ID           int    `json:"id"`
+	CategoryName string `json:"category_name"`
 }
 
 type Order struct {

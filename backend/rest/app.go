@@ -21,12 +21,14 @@ import (
 )
 
 type App struct {
-	Router     *mux.Router
+	Router *mux.Router
+
 	Users      api.UserRepo
 	BakedGoods api.BakedGoodRepo
 	Orders     api.OrderRepo
 	Reviews    api.ReviewRepo
 	Tags       api.TagRepo
+	Categories api.CategoryRepo
 	Validator  *validator.Validate
 	Translator ut.Translator
 	Server     *http.Server
@@ -38,6 +40,7 @@ func (a *App) Init(user, password, dbname string) {
 	a.Orders = api.NewOrdersRepoMysql(user, password, dbname)
 	a.Reviews = api.NewReviewsRepoMysql(user, password, dbname)
 	a.Tags = api.NewTagsRepoMysql(user, password, dbname)
+	a.Categories = api.NewCategoriesRepoMysql(user, password, dbname)
 
 	// Create and configure validator and translator
 	a.Validator = validator.New()
@@ -113,6 +116,13 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/tags/{id:[0-9]+}", a.getTag).Methods("GET")
 	a.Router.HandleFunc("/tags/{id:[0-9]+}", a.updateTag).Methods("PUT")
 	a.Router.HandleFunc("/tags/{id:[0-9]+}", a.deleteTag).Methods("DELETE")
+
+	// Categories routes
+	a.Router.HandleFunc("/categories", a.getCategories).Methods("GET")
+	a.Router.HandleFunc("/categories", a.createCategory).Methods("POST")
+	a.Router.HandleFunc("/categories/{id:[0-9]+}", a.getCategory).Methods("GET")
+	a.Router.HandleFunc("/categories/{id:[0-9]+}", a.updateCategory).Methods("PUT")
+	a.Router.HandleFunc("/categories/{id:[0-9]+}", a.deleteCategory).Methods("DELETE")
 
 	// Auth route
 	s := a.Router.PathPrefix("/auth").Subrouter()
@@ -262,7 +272,7 @@ func (a *App) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//// remove user password
-	//user.Password = ""
+	user.Password = ""
 
 	respondWithJSON(w, http.StatusCreated, user)
 }
@@ -932,4 +942,143 @@ func (a *App) deleteTag(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, tag)
+}
+
+//Category handlers
+func (a *App) getCategories(w http.ResponseWriter, r *http.Request) {
+	count, err := strconv.Atoi(r.FormValue("count"))
+	if err != nil && r.FormValue("count") != "" {
+		respondWithError(w, http.StatusBadRequest, "Invalid request count parameter")
+		return
+	}
+	start, err := strconv.Atoi(r.FormValue("start"))
+	if err != nil && r.FormValue("start") != "" {
+		respondWithError(w, http.StatusBadRequest, "Invalid request start parameter")
+		return
+	}
+	start--
+	if count > 20 || count < 1 {
+		count = 20
+	}
+	if start < 0 {
+		start = 0
+	}
+	categories, err := a.Tags.FindAll(start, count)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, categories)
+}
+
+func (a *App) createCategory(w http.ResponseWriter, r *http.Request) {
+	category := &entities.Category{}
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(category); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	// Validate User struct
+	err := a.Validator.Struct(category)
+	if err != nil {
+		// translate all error at once
+		errs := err.(validator.ValidationErrors)
+		respondWithValidationError(errs.Translate(a.Translator), w)
+		return
+	}
+
+	if category, err = a.Categories.Create(category); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusCreated, category)
+}
+
+func (a *App) getCategory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid category ID")
+		return
+	}
+
+	var category *entities.Category
+	if category, err = a.Categories.FindByID(id); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "category not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, category)
+}
+
+func (a *App) updateCategory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid category ID")
+		return
+	}
+
+	category := &entities.Category{}
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(category); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+	// Validate User struct
+	err = a.Validator.Struct(category)
+	if err != nil {
+		// translate all error at once
+		errs := err.(validator.ValidationErrors)
+		respondWithValidationError(errs.Translate(a.Translator), w)
+		return
+	}
+
+	// Find if baked good exists in DB
+	_, err = a.Categories.FindByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusNotFound, fmt.Sprintf("category with ID='%d' does not exist", id))
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	category.ID = id
+
+	// Do update baked good
+	if category, err = a.Categories.Update(category); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, category)
+}
+
+func (a *App) deleteCategory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid category ID")
+		return
+	}
+	// Do delete baked good in DB
+	category, err := a.Categories.DeleteByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusNotFound, fmt.Sprintf("category with ID='%d' does not exist", id))
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, category)
 }

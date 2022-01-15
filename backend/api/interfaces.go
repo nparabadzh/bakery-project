@@ -47,3 +47,11 @@ type TagRepo interface {
 	Update(tag *entities.Tag) (*entities.Tag, error)
 	DeleteByID(id int) (*entities.Tag, error)
 }
+
+type CategoryRepo interface {
+	FindAll(start, count int) ([]entities.Category, error)
+	FindByID(id int) (*entities.Category, error)
+	Create(category *entities.Category) (*entities.Category, error)
+	Update(category *entities.Category) (*entities.Category, error)
+	DeleteByID(id int) (*entities.Category, error)
+}
