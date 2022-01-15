@@ -44,7 +44,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const CollectionItem = ({ item }) => {
+const CollectionItem = ({ item, disabled }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { name, price, photo } = item;
@@ -63,6 +63,7 @@ const CollectionItem = ({ item }) => {
       </div>
       <div style={{ paddign: 10, margin: 10 }}>
         <CustomButton
+          disabled={disabled}
           onClick={() => {
             dispatch(addItem(item));
           }}

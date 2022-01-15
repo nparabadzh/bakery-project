@@ -161,10 +161,13 @@ export default function PrimarySearchAppBar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <div className={classes.cartIconDiv} onClick={toggleCart}>
-              <ShoppingCartIcon />
-              <span className={classes.itemCount}>{itemCount}</span>
-            </div>
+            {currentUser && (
+              <div className={classes.cartIconDiv} onClick={toggleCart}>
+                <ShoppingCartIcon />
+                <span className={classes.itemCount}>{itemCount}</span>
+              </div>
+            )}
+
             {hidden ? null : <CartDropdown />}
             <IconButton
               edge="end"

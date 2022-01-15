@@ -2,6 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 import CollectionItem from './CollectionItem';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(() => ({
   page: {
@@ -21,13 +22,17 @@ const useStyles = makeStyles(() => ({
 
 const CollectionPage = ({ items, title }) => {
   const classes = useStyles();
-  console.log(items);
+  const currentUser = useSelector((state) => state.user.currentUser);
   return (
     <div className={classes.page}>
       <h2 className={classes.title}>{title}</h2>
       <div className={classes.items}>
         {items.map((item) => (
-          <CollectionItem key={item.id} item={item} />
+          <CollectionItem
+            key={item.id}
+            item={item}
+            disabled={currentUser == null}
+          />
         ))}
       </div>
     </div>
