@@ -2,6 +2,8 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 import CustomButton from '../CustomButton';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../../redux/cart/actions';
 
 const useStyles = makeStyles(() => ({
   collectionItem: {
@@ -44,6 +46,7 @@ const useStyles = makeStyles(() => ({
 
 const CollectionItem = ({ item }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const { name, price, photo } = item;
 
   return (
@@ -59,7 +62,13 @@ const CollectionItem = ({ item }) => {
         <span className={classes.price}>Price: {price} bgn</span>
       </div>
       <div style={{ paddign: 10, margin: 10 }}>
-        <CustomButton onClick={() => {}}>Add to cart</CustomButton>
+        <CustomButton
+          onClick={() => {
+            dispatch(addItem(item));
+          }}
+        >
+          Add to cart
+        </CustomButton>
       </div>
     </div>
   );

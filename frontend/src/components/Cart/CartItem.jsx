@@ -10,6 +10,7 @@ const useStyles = makeStyles(() => ({
   },
   itemDetails: {
     width: '70%',
+    color: 'black',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
@@ -23,14 +24,13 @@ const useStyles = makeStyles(() => ({
 
 const CartItem = ({ item: { imageUrl, price, name, quantity } }) => {
   const classes = useStyles();
-  console.log(classes);
   return (
     <div className={classes.cartItem}>
       <img style={{ width: '30%' }} src={imageUrl} alt="item" />
       <div className={classes.itemDetails}>
         <span className={classes.name}>{name}</span>
         <span className={classes.price}>
-          {quantity} x ${price}
+          {quantity} x {price} bgn
         </span>
       </div>
     </div>

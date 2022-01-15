@@ -4,6 +4,7 @@ import CustomButton from '../CustomButton';
 import CartItem from './CartItem';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(() => ({
   cartDropdown: {
@@ -12,15 +13,17 @@ const useStyles = makeStyles(() => ({
     height: 340,
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
     padding: 20,
     border: '1px solid black',
     backgroundColor: 'white',
-    top: 90,
-    right: 40,
+    top: 50,
+    right: 10,
     zIndex: 5,
   },
   emptyMsg: {
     fontSize: 18,
+    color: 'black',
     margin: '50px auto',
   },
   cartItems: {
@@ -34,8 +37,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const CartDropdown = ({ cartItems }) => {
+const CartDropdown = () => {
   const classes = useStyles();
+  const cartItems = useSelector((state) => state.cart.cartItems);
   return (
     <div className={classes.cartDropdown}>
       <div className={classes.cartItems}>
@@ -49,6 +53,7 @@ const CartDropdown = ({ cartItems }) => {
       </div>
       <div className={classes.button}>
         <CustomButton
+          disabled={cartItems.length === 0}
           onClick={() => {
             // history.push('/checkout');
             // dispatch(toggleCartHidden());

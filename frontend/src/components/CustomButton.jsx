@@ -1,5 +1,5 @@
 import React from 'react';
-
+import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(() => ({
@@ -26,12 +26,19 @@ const useStyles = makeStyles(() => ({
       border: '1px solid black',
     },
   },
+  disabled: {
+    opacity: 0.4,
+    pointerEvents: 'none',
+  },
 }));
 
-const CustomButton = ({ children, ...otherProps }) => {
+const CustomButton = ({ children, disabled, ...otherProps }) => {
   const classes = useStyles();
   return (
-    <button className={classes.customButton} {...otherProps}>
+    <button
+      className={clsx(classes.customButton, disabled && classes.disabled)}
+      {...otherProps}
+    >
       {children}
     </button>
   );

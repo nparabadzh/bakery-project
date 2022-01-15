@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+// import { createStructuredSelector } from 'reselect';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -13,6 +14,9 @@ import CakeIcon from '@material-ui/icons/Cake';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 
 import { setCurrentUser } from '../redux/user/actions';
+import { toggleCartHidden } from '../redux/cart/actions';
+import { selectCartItemsCount } from '../redux/cart/selectors';
+import CartDropdown from '../components/Cart/CartDropdown';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -47,6 +51,15 @@ const useStyles = makeStyles((theme) => ({
       borderBottom: '1px solid white',
     },
   },
+  cartIconDiv: {
+    width: 45,
+    height: 45,
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+  },
 }));
 
 export default function PrimarySearchAppBar() {
@@ -55,6 +68,8 @@ export default function PrimarySearchAppBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
+  const hidden = useSelector((state) => state.cart.hidden);
+  const itemCount = useSelector(selectCartItemsCount);
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -78,7 +93,12 @@ export default function PrimarySearchAppBar() {
     dispatch(setCurrentUser(null));
   };
 
+  const toggleCart = () => {
+    dispatch(toggleCartHidden());
+  };
+
   const menuId = 'primary-search-account-menu';
+
   const renderSignInMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -141,16 +161,11 @@ export default function PrimarySearchAppBar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={() => {}}
-              color="inherit"
-            >
+            <div className={classes.cartIconDiv} onClick={toggleCart}>
               <ShoppingCartIcon />
-            </IconButton>
+              <span className={classes.itemCount}>{itemCount}</span>
+            </div>
+            {hidden ? null : <CartDropdown />}
             <IconButton
               edge="end"
               aria-label="account of current user"
