@@ -14,6 +14,7 @@ type UserRepo interface {
 
 type BakedGoodRepo interface {
 	FindAll(start, count int) ([]entities.BakedGood, error)
+	FindAllFromCategory(start, count, categoryId int) ([]entities.BakedGood, error)
 	FindByID(id int) (*entities.BakedGood, error)
 	FindByName(name string) (*entities.BakedGood, error)
 	Create(bakedGood *entities.BakedGood) (*entities.BakedGood, error)

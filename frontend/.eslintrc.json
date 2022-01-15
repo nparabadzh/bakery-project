@@ -35,6 +35,7 @@
   },
   "plugins": ["react"],
   "rules": {
-    "no-debugger": "off"
+    "no-debugger": "off",
+    "react/prop-types": 0
   }
 }

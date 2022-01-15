@@ -408,13 +408,57 @@ func (a *App) getBakedGoods(w http.ResponseWriter, r *http.Request) {
 	if start < 0 {
 		start = 0
 	}
-	bakedGoods, err := a.BakedGoods.FindAll(start, count)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
+	param1 := r.URL.Query().Get("category_id")
+	if param1 == "" {
+		bakedGoods, err := a.BakedGoods.FindAll(start, count)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, bakedGoods)
+	} else {
+		category, err := strconv.Atoi(param1)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid category ID")
+			return
+		}
+		bakedGoods, err := a.BakedGoods.FindAllFromCategory(start, count, category)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, bakedGoods)
 	}
-	respondWithJSON(w, http.StatusOK, bakedGoods)
+
 }
+
+//func (a *App) getBakedGoodsFromCategory(w http.ResponseWriter, r *http.Request) {
+//	count, err := strconv.Atoi(r.FormValue("count"))
+//	if err != nil && r.FormValue("count") != "" {
+//		respondWithError(w, http.StatusBadRequest, "Invalid request count parameter")
+//		return
+//	}
+//	start, err := strconv.Atoi(r.FormValue("start"))
+//	if err != nil && r.FormValue("start") != "" {
+//		respondWithError(w, http.StatusBadRequest, "Invalid request start parameter")
+//		return
+//	}
+//	start--
+//	if count > 20 || count < 1 {
+//		count = 20
+//	}
+//	if start < 0 {
+//		start = 0
+//	}
+//	//vars := mux.Vars(r)
+//	//categoryId, err := strconv.Atoi(vars["category-id"])
+//
+//	if err != nil {
+//		respondWithError(w, http.StatusInternalServerError, err.Error())
+//		return
+//	}
+//	respondWithJSON(w, http.StatusOK, bakedGoods)
+//}
 
 func (a *App) createBakedGood(w http.ResponseWriter, r *http.Request) {
 	bakedGood := &entities.BakedGood{}
@@ -963,7 +1007,7 @@ func (a *App) getCategories(w http.ResponseWriter, r *http.Request) {
 	if start < 0 {
 		start = 0
 	}
-	categories, err := a.Tags.FindAll(start, count)
+	categories, err := a.Categories.FindAll(start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return

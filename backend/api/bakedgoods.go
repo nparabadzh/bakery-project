@@ -35,6 +35,29 @@ func (u BakedGoodsRepoMySql) FindAll(start, count int) ([]entities.BakedGood, er
 	return bakedGoods, nil
 }
 
+func (u BakedGoodsRepoMySql) FindAllFromCategory(start, count, categoryId int) ([]entities.BakedGood, error) {
+	statement := "SELECT * FROM bakedGoods WHERE category_id=? LIMIT ? OFFSET ?"
+	rows, err := u.db.Query(statement, categoryId, count, start)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	bakedGoods := []entities.BakedGood{}
+	for rows.Next() {
+		var bakedGood entities.BakedGood
+		err := rows.Scan(&bakedGood.ID, &bakedGood.Name, &bakedGood.PhotoUrl, &bakedGood.Price, &bakedGood.CategoryId)
+		if err != nil {
+			return nil, err
+		}
+		bakedGoods = append(bakedGoods, bakedGood)
+	}
+	rows.Close()
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return bakedGoods, nil
+}
+
 //FindById return bakedgoods by baked good ID or error otherwise
 func (u *BakedGoodsRepoMySql) FindByID(id int) (*entities.BakedGood, error) {
 	bakedGood := &entities.BakedGood{}

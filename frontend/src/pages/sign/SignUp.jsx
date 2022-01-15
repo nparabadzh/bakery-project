@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import { setCurrentUser } from '../redux/user/actions';
+import { setCurrentUser } from '../../redux/user/actions';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -24,14 +24,14 @@ const SignUp = () => {
       .post(`/signUp`, {
         email,
         password,
-        firstName,
-        lastName,
-        deliveryAddress,
+        first_name: firstName,
+        last_name: lastName,
+        delivery_address: deliveryAddress,
       })
       .then((res) => {
         debugger;
         if (res.statusText === 'Created') {
-          dispatch(setCurrentUser(res.data.user));
+          dispatch(setCurrentUser(res.data));
           navigate('/');
         }
       })
