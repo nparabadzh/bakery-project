@@ -18,6 +18,7 @@ func main() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	a.Run(":8080")
+
 	<-done
 	log.Println("Stopping HTTP server ...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

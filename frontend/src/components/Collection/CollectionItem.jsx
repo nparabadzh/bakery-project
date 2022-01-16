@@ -61,7 +61,7 @@ const CollectionItem = ({ item, disabled }) => {
         <span className={classes.name}>{name}</span>
         <span className={classes.price}>Price: {price} bgn</span>
       </div>
-      <div style={{ paddign: 10, margin: 10 }}>
+      <div style={{ padding: 10, margin: 10 }}>
         <CustomButton
           disabled={disabled}
           onClick={() => {

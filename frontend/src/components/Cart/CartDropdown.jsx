@@ -1,10 +1,11 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 import CustomButton from '../CustomButton';
 import CartItem from './CartItem';
-
-import { makeStyles } from '@material-ui/core/styles';
-import { useSelector } from 'react-redux';
+import { toggleCartHidden } from '../../redux/cart/actions';
 
 const useStyles = makeStyles(() => ({
   cartDropdown: {
@@ -39,6 +40,8 @@ const useStyles = makeStyles(() => ({
 
 const CartDropdown = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cartItems);
   return (
     <div className={classes.cartDropdown}>
@@ -55,8 +58,8 @@ const CartDropdown = () => {
         <CustomButton
           disabled={cartItems.length === 0}
           onClick={() => {
-            // history.push('/checkout');
-            // dispatch(toggleCartHidden());
+            navigate('/checkout');
+            dispatch(toggleCartHidden());
           }}
         >
           GO TO CHECKOUT

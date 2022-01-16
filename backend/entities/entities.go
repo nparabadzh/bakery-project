@@ -61,9 +61,10 @@ type BakedGoodTag struct {
 }
 
 type OrderedGoods struct {
-	ID      int64 `json:"id"`
-	GoodID  int64 `json:"good_id"`
-	OrderID int64 `json:"order_id"`
+	ID       int64 `json:"id"`
+	GoodID   int64 `json:"good_id"`
+	OrderID  int64 `json:"order_id"`
+	Quantity int64 `json:"quantity"`
 }
 
 type UserToken struct {

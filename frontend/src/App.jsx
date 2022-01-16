@@ -10,6 +10,7 @@ import Pastries from './pages/pastries';
 import Other from './pages/other';
 import SignIn from './pages/sign/SignIn';
 import SignUp from './pages/sign/SignUp';
+import CheckoutPage from './pages/checkout/Checkout';
 import axios from 'axios';
 import { setCategories } from './redux/categories/actions';
 
@@ -40,6 +41,7 @@ function App() {
         <Route path="other" element={<Other />} />
         <Route path="signin" element={<SignIn />} />
         <Route path="signup" element={<SignUp />} />
+        <Route exact path="/checkout" element={<CheckoutPage />} />
       </Routes>
     </div>
   );

@@ -56,3 +56,13 @@ type CategoryRepo interface {
 	Update(category *entities.Category) (*entities.Category, error)
 	DeleteByID(id int) (*entities.Category, error)
 }
+
+type OrderedGoodsRepo interface {
+	FindAll(start, count int) ([]entities.OrderedGoods, error)
+	FindAllFromOrder(start, count, orderId int) ([]entities.OrderedGoods, error)
+	FindByID(id int) (*entities.OrderedGoods, error)
+	Create(category *entities.OrderedGoods) (*entities.OrderedGoods, error)
+	Update(category *entities.OrderedGoods) (*entities.OrderedGoods, error)
+	DeleteByID(id int) (*entities.OrderedGoods, error)
+	Count() (int, error)
+}

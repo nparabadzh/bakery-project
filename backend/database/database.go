@@ -11,7 +11,9 @@ import (
 )
 
 const (
-	dbname = "bakery"
+	dbname   = "bakery"
+	username = "root"
+	password = "admin123"
 )
 
 var (
@@ -20,7 +22,7 @@ var (
 )
 
 func main() {
-	db, err := sql.Open("mysql", "root:admin123@tcp(127.0.0.1:3306)/"+dbname)
+	db, err := sql.Open("mysql", username+":"+password+"@tcp(127.0.0.1:3306)/"+dbname)
 	if err != nil {
 		panic(err.Error()) // Just for example purpose. You should use proper error handling instead of panic
 	}
@@ -48,7 +50,7 @@ func main() {
 	log.Printf("rows affected %d\n", no)
 
 	db.Close()
-	db, err = sql.Open("mysql", "root:admin123@tcp(localhost:3306)/bakery")
+	db, err = sql.Open("mysql", username+":"+password+"@tcp(localhost:3306)/"+dbname)
 	if err != nil {
 		log.Printf("Error %s when opening DB", err)
 		return
@@ -103,13 +105,37 @@ func main() {
 	// Insert baked goods
 	bakedGoods := []entities.BakedGood{
 		{Name: "Chocolate cake", Price: 12.4,
-			PhotoUrl: "backend/images/chocolate-cake.jpeg", CategoryId: 4},
+			PhotoUrl: "https://img.taste.com.au/P9x2Yltr/taste/2016/11/homemade-chocolate-cake-85524-1.jpeg", CategoryId: 4},
+		{Name: "Lemon cake", Price: 19.6,
+			PhotoUrl: "https://www.recipetineats.com/wp-content/uploads/2021/09/Lemon-Cake-with-Lemon-Frosting_85-SQ.jpg", CategoryId: 4},
 		{Name: "Red velvet cake", Price: 20,
-			PhotoUrl: "backend/images/red-velvet-cake.jpeg", CategoryId: 4},
+			PhotoUrl: "https://www.cookingclassy.com/wp-content/uploads/2014/11/red-velvet-cake-5.jpg", CategoryId: 4},
 		{Name: "Cheesecake", Price: 15.3,
-			PhotoUrl: "backend/images/cheesecake.jpeg", CategoryId: 7},
+			PhotoUrl: "https://natashaskitchen.com/wp-content/uploads/2020/05/Pefect-Cheesecake-7.jpg", CategoryId: 9},
+		{Name: "Strawberry clafoutis", Price: 9.1,
+			PhotoUrl: "https://thenewbaguette.com/wp-content/uploads/2019/06/strawberry-clafoutis-16.jpg", CategoryId: 9},
+		{Name: "Croissants", Price: 7.1,
+			PhotoUrl: "https://static01.nyt.com/images/2021/04/07/dining/06croissantsrex1/merlin_184841898_ccc8fb62-ee41-44e8-9ddf-b95b198b88db-articleLarge.jpg", CategoryId: 9},
+		{Name: "Tart au Chocolat", Price: 22,
+			PhotoUrl: "https://images.ricardocuisine.com/services/recipes/8284-portrait.jpg", CategoryId: 5},
+		{Name: "Tart au Citron", Price: 12.3,
+			PhotoUrl: "https://clemfoodie.com/wp-content/uploads/2021/03/tarte-citron-chantilly-1-scaled.jpg", CategoryId: 5},
+		{Name: "Lavender Cake", Price: 32.3,
+			PhotoUrl: "https://allysabakes.files.wordpress.com/2019/05/whitagram-image-4.jpg", CategoryId: 4},
+		{Name: "Apple Pie", Price: 9.3,
+			PhotoUrl: "https://cdn3.tmbi.com/toh/GoogleImagesPostCard/exps6086_HB133235C07_19_4b_WEB.jpg", CategoryId: 5},
+		{Name: "Blueberry Pie", Price: 15.1,
+			PhotoUrl: "https://www.tasteofhome.com/wp-content/uploads/2018/01/Contest-Winning-Fresh-Blueberry-Pie_exps10457_BS3149327B02_26_1bC_RMS-4.jpg", CategoryId: 5},
+		{Name: "Mille Feuille", Price: 9.3,
+			PhotoUrl: "http://oogio.net/wp-content/uploads/2016/11/tropical_mille_feuille-s.jpg", CategoryId: 8},
+		{Name: "Saint Honore", Price: 14.8,
+			PhotoUrl: "https://www.elle-et-vire.com/uploads/cache/930w/uploads/recip/recipe/870/230009.png", CategoryId: 8},
+		{Name: "Vanilla Cake", Price: 53.8,
+			PhotoUrl: "https://livforcake.com/wp-content/uploads/2017/06/vanilla-cake-4.jpg", CategoryId: 4},
+		{Name: "Lemon Ricotta Cheesecake", Price: 15.3,
+			PhotoUrl: "https://img.delicious.com.au/1H84Dz4k/del/2017/08/italian-style-ricotta-cheesecake-51070-2.jpg", CategoryId: 9},
 		{Name: "Profiteroles", Price: 7.2,
-			PhotoUrl: "backend/images/profiteroles.jpeg", CategoryId: 8},
+			PhotoUrl: "https://images.immediate.co.uk/production/volatile/sites/30/2020/11/profiteroles-0dde0bb.jpg?quality=45&resize=504,458?quality=90&webp=true&resize=504,458", CategoryId: 8},
 	}
 	stmt, err = db.Prepare("INSERT INTO bakedGoods(name, price, photo_url, category_id) VALUES( ?,?,?,?)")
 	if err != nil {
@@ -276,7 +302,7 @@ func createDbs(db *sql.DB) {
 	rowsAffected, err = res.RowsAffected()
 	log.Printf("ORDERS - Rows Affected: %d %v", rowsAffected, err)
 
-	res, err = db.Exec("CREATE TABLE `orderedGoods` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`bakedGoodId` bigint(20) DEFAULT NULL,`orderId` bigint(20) DEFAULT NULL,PRIMARY KEY (`id`),FOREIGN KEY (`bakedGoodId`) REFERENCES `bakedGoods` (`id`),FOREIGN KEY (`orderId`) REFERENCES `orders` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
+	res, err = db.Exec("CREATE TABLE `orderedGoods` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`bakedGoodId` bigint(20) DEFAULT NULL,`orderId` bigint(20) DEFAULT NULL, `quantity` bigint(20) DEFAULT NULL, PRIMARY KEY (`id`),FOREIGN KEY (`bakedGoodId`) REFERENCES `bakedGoods` (`id`),FOREIGN KEY (`orderId`) REFERENCES `orders` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}

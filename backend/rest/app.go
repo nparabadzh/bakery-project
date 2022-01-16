@@ -23,15 +23,16 @@ import (
 type App struct {
 	Router *mux.Router
 
-	Users      api.UserRepo
-	BakedGoods api.BakedGoodRepo
-	Orders     api.OrderRepo
-	Reviews    api.ReviewRepo
-	Tags       api.TagRepo
-	Categories api.CategoryRepo
-	Validator  *validator.Validate
-	Translator ut.Translator
-	Server     *http.Server
+	Users        api.UserRepo
+	BakedGoods   api.BakedGoodRepo
+	Orders       api.OrderRepo
+	Reviews      api.ReviewRepo
+	Tags         api.TagRepo
+	Categories   api.CategoryRepo
+	OrderedGoods api.OrderedGoodsRepo
+	Validator    *validator.Validate
+	Translator   ut.Translator
+	Server       *http.Server
 }
 
 func (a *App) Init(user, password, dbname string) {
@@ -41,6 +42,7 @@ func (a *App) Init(user, password, dbname string) {
 	a.Reviews = api.NewReviewsRepoMysql(user, password, dbname)
 	a.Tags = api.NewTagsRepoMysql(user, password, dbname)
 	a.Categories = api.NewCategoriesRepoMysql(user, password, dbname)
+	a.OrderedGoods = api.NewOrderedGoodsRepoMySql(user, password, dbname)
 
 	// Create and configure validator and translator
 	a.Validator = validator.New()
@@ -123,6 +125,13 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/categories/{id:[0-9]+}", a.getCategory).Methods("GET")
 	a.Router.HandleFunc("/categories/{id:[0-9]+}", a.updateCategory).Methods("PUT")
 	a.Router.HandleFunc("/categories/{id:[0-9]+}", a.deleteCategory).Methods("DELETE")
+
+	// Categories routes
+	a.Router.HandleFunc("/orderedGoods", a.getOrderedGoods).Methods("GET")
+	a.Router.HandleFunc("/orderedGoods", a.createCategory).Methods("POST")
+	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.getCategory).Methods("GET")
+	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.updateCategory).Methods("PUT")
+	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.deleteCategory).Methods("DELETE")
 
 	// Auth route
 	s := a.Router.PathPrefix("/auth").Subrouter()
@@ -431,34 +440,6 @@ func (a *App) getBakedGoods(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
-//func (a *App) getBakedGoodsFromCategory(w http.ResponseWriter, r *http.Request) {
-//	count, err := strconv.Atoi(r.FormValue("count"))
-//	if err != nil && r.FormValue("count") != "" {
-//		respondWithError(w, http.StatusBadRequest, "Invalid request count parameter")
-//		return
-//	}
-//	start, err := strconv.Atoi(r.FormValue("start"))
-//	if err != nil && r.FormValue("start") != "" {
-//		respondWithError(w, http.StatusBadRequest, "Invalid request start parameter")
-//		return
-//	}
-//	start--
-//	if count > 20 || count < 1 {
-//		count = 20
-//	}
-//	if start < 0 {
-//		start = 0
-//	}
-//	//vars := mux.Vars(r)
-//	//categoryId, err := strconv.Atoi(vars["category-id"])
-//
-//	if err != nil {
-//		respondWithError(w, http.StatusInternalServerError, err.Error())
-//		return
-//	}
-//	respondWithJSON(w, http.StatusOK, bakedGoods)
-//}
 
 func (a *App) createBakedGood(w http.ResponseWriter, r *http.Request) {
 	bakedGood := &entities.BakedGood{}
@@ -1125,4 +1106,158 @@ func (a *App) deleteCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, category)
+}
+
+//Ordered Goods handlers
+func (a *App) getOrderedGoods(w http.ResponseWriter, r *http.Request) {
+	count, err := strconv.Atoi(r.FormValue("count"))
+	if err != nil && r.FormValue("count") != "" {
+		respondWithError(w, http.StatusBadRequest, "Invalid request count parameter")
+		return
+	}
+	start, err := strconv.Atoi(r.FormValue("start"))
+	if err != nil && r.FormValue("start") != "" {
+		respondWithError(w, http.StatusBadRequest, "Invalid request start parameter")
+		return
+	}
+	start--
+	if count > 20 || count < 1 {
+		count = 20
+	}
+	if start < 0 {
+		start = 0
+	}
+	param1 := r.URL.Query().Get("orderId")
+	if param1 == "" {
+		orderedGoods, err := a.OrderedGoods.FindAll(start, count)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, orderedGoods)
+	} else {
+		order, err := strconv.Atoi(param1)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid order ID")
+			return
+		}
+		orderedGoods, err := a.OrderedGoods.FindAllFromOrder(start, count, order)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, orderedGoods)
+	}
+
+}
+
+func (a *App) createOrderedGood(w http.ResponseWriter, r *http.Request) {
+	orderedGood := &entities.OrderedGoods{}
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(orderedGood); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	// Validate User struct
+	err := a.Validator.Struct(orderedGood)
+	if err != nil {
+		// translate all error at once
+		errs := err.(validator.ValidationErrors)
+		respondWithValidationError(errs.Translate(a.Translator), w)
+		return
+	}
+
+	if orderedGood, err = a.OrderedGoods.Create(orderedGood); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusCreated, orderedGood)
+}
+
+func (a *App) getOrderedGood(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid ordered good ID")
+		return
+	}
+
+	var orderedGood *entities.OrderedGoods
+	if orderedGood, err = a.OrderedGoods.FindByID(id); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Ordered Good not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, orderedGood)
+}
+
+func (a *App) updateOrderedGood(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid ordered good ID")
+		return
+	}
+
+	orderedGood := &entities.OrderedGoods{}
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(orderedGood); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+	// Validate User struct
+	err = a.Validator.Struct(orderedGood)
+	if err != nil {
+		// translate all error at once
+		errs := err.(validator.ValidationErrors)
+		respondWithValidationError(errs.Translate(a.Translator), w)
+		return
+	}
+
+	// Find if baked good exists in DB
+	_, err = a.OrderedGoods.FindByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusNotFound, fmt.Sprintf("ordered good with ID='%d' does not exist", id))
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	orderedGood.ID = int64(id)
+
+	// Do update baked good
+	if orderedGood, err = a.OrderedGoods.Update(orderedGood); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, orderedGood)
+}
+
+func (a *App) deleteOrderedGood(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid ordered Good ID")
+		return
+	}
+	// Do delete baked good in DB
+	orderedGood, err := a.OrderedGoods.DeleteByID(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			respondWithError(w, http.StatusNotFound, fmt.Sprintf("ordered good with ID='%d' does not exist", id))
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, orderedGood)
 }
