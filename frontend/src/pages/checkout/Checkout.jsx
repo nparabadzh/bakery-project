@@ -1,11 +1,15 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { makeStyles } from '@material-ui/core/styles';
 
 import CheckoutItem from '../../components/CheckoutItem';
 
 import { selectCartItems, selectCartTotal } from '../../redux/cart/selectors';
+import CustomButton from '../../components/CustomButton';
+import axios from 'axios';
+import { useNavigate } from 'react-router';
+import { clearCart } from '../../redux/cart/actions';
 
 const useStyles = makeStyles(() => ({
   checkoutPage: {
@@ -36,7 +40,7 @@ const useStyles = makeStyles(() => ({
   total: {
     marginTop: 30,
     marginLeft: 'auto',
-    fontSize: 36,
+    fontSize: 25,
   },
 }));
 
@@ -47,7 +51,35 @@ const pageSelector = createStructuredSelector({
 
 const CheckoutPage = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { cartItems, total } = useSelector(pageSelector);
+  const user = useSelector((state) => state.user.currentUser);
+
+  const placeOrder = async () => {
+    axios
+      .post('/orders', {
+        user_id: user.id,
+        delivery_address: user.delivery_address,
+        status: 'unprocessed',
+      })
+      .then((data) => {
+        let orderId = data.data.id;
+        cartItems.forEach((item) => {
+          axios.post('/orderedGoods', {
+            good_id: item.id,
+            order_id: orderId,
+            quantity: item.quantity,
+          });
+        });
+        alert('Order is successfuly created!');
+        dispatch(clearCart());
+        navigate('/');
+      })
+      .catch((error) => console.log(error));
+  };
+
   return (
     <div className={classes.checkoutPage}>
       <div className={classes.checkoutHeader}>
@@ -70,7 +102,10 @@ const CheckoutPage = () => {
       {cartItems.map((cartItem) => (
         <CheckoutItem key={cartItem.id} cartItem={cartItem} />
       ))}
-      <div className={classes.headerBlock}>TOTAL: ${total}</div>
+      <div className={classes.total}>TOTAL: {total} bgn</div>
+      <CustomButton onClick={placeOrder} disabled={total === 0}>
+        Place Order
+      </CustomButton>
     </div>
   );
 };

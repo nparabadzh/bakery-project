@@ -19,15 +19,15 @@ const useStyles = makeStyles(() => ({
     border: '1px solid black',
   },
   image: {
-    width: '100%',
-    height: '95%',
+    width: '90%',
+    height: '90%',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     marginBlock: 5,
   },
   footer: {
     width: '100%',
-    height: '5%',
+    height: '10%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-around',
@@ -37,6 +37,7 @@ const useStyles = makeStyles(() => ({
   name: {
     textAlign: 'center',
     marginBottom: 15,
+    marginTop: 15,
   },
   price: {
     textAlign: 'center',

@@ -295,7 +295,7 @@ func createDbs(db *sql.DB) {
 	rowsAffected, err = res.RowsAffected()
 	log.Printf("BAKED GOODS TAGS - Rows Affected: %d %v", rowsAffected, err)
 
-	res, err = db.Exec("CREATE TABLE `orders` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`userId` bigint(20) DEFAULT NULL,`status` varchar(50) DEFAULT NULL,`deliveryAddress` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`),FOREIGN KEY (`userId`) REFERENCES `users` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
+	res, err = db.Exec("CREATE TABLE `orders` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`userId` bigint(20),`status` varchar(50) DEFAULT NULL,`deliveryAddress` varchar(255) DEFAULT NULL,PRIMARY KEY (`id`),FOREIGN KEY (`userId`) REFERENCES `users` (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;")
 	if err != nil {
 		log.Fatal(err)
 	}

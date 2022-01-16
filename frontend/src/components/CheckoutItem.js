@@ -23,6 +23,7 @@ const useStyles = makeStyles(() => ({
   },
   quantity: {
     width: '23%',
+    display: 'flex',
   },
   arrow: {
     cursor: 'pointer',
@@ -42,13 +43,13 @@ const useStyles = makeStyles(() => ({
 const CheckoutItem = ({ cartItem }) => {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const { name, imageUrl, price, quantity } = cartItem;
+  const { name, photo, price, quantity } = cartItem;
   return (
     <div className={classes.checkoutItem}>
       <div className={classes.imageContainer}>
         <img
-          styles={{ width: '100%', height: '100%' }}
-          src={imageUrl}
+          style={{ width: '100%', height: '150px' }}
+          src={photo}
           alt="item"
         />
       </div>
@@ -68,7 +69,7 @@ const CheckoutItem = ({ cartItem }) => {
           &#10095;
         </div>
       </span>
-      <span className={classes.price}>{price}</span>
+      <span className={classes.price}>{price} bgn</span>
       <div
         className={classes.removeButton}
         onClick={() => dispatch(clearItemFromCart(cartItem))}

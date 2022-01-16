@@ -10,6 +10,7 @@
   left: 0;
   right: 0;
   width: 100%;
+  min-height: 2000px;
   height: 100%;
   filter: blur(4px);
   background-image: url('https://hips.hearstapps.com/del.h-cdn.co/assets/16/38/1600x800/landscape-1474650684-cakes-group-193.jpg');

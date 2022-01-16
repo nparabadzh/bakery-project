@@ -7,8 +7,9 @@ const useStyles = makeStyles(() => ({
   home: {
     position: 'relative',
     padding: 20,
-    width: '100%',
     height: '100vw',
+    display: 'flex',
+    flexDirection: 'column',
   },
   mainImg: {
     width: 'auto',

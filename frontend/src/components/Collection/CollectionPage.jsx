@@ -15,6 +15,7 @@ const useStyles = makeStyles(() => ({
   },
   items: {
     display: 'grid',
+    width: '95%',
     gridTemplateColumns: '1fr 1fr 1fr 1fr',
     gridGap: 10,
   },

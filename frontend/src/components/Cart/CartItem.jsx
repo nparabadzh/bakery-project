@@ -22,11 +22,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const CartItem = ({ item: { imageUrl, price, name, quantity } }) => {
+const CartItem = ({ item: { photo, price, name, quantity } }) => {
   const classes = useStyles();
+  debugger;
   return (
     <div className={classes.cartItem}>
-      <img style={{ width: '30%' }} src={imageUrl} alt="item" />
+      <img style={{ width: '30%' }} src={photo} alt="item" />
       <div className={classes.itemDetails}>
         <span className={classes.name}>{name}</span>
         <span className={classes.price}>

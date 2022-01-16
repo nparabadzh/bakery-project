@@ -128,10 +128,10 @@ func (a *App) initializeRoutes() {
 
 	// Categories routes
 	a.Router.HandleFunc("/orderedGoods", a.getOrderedGoods).Methods("GET")
-	a.Router.HandleFunc("/orderedGoods", a.createCategory).Methods("POST")
-	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.getCategory).Methods("GET")
-	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.updateCategory).Methods("PUT")
-	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.deleteCategory).Methods("DELETE")
+	a.Router.HandleFunc("/orderedGoods", a.createOrderedGood).Methods("POST")
+	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.getOrderedGood).Methods("GET")
+	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.updateOrderedGood).Methods("PUT")
+	a.Router.HandleFunc("/orderedGoods/{id:[0-9]+}", a.deleteOrderedGood).Methods("DELETE")
 
 	// Auth route
 	s := a.Router.PathPrefix("/auth").Subrouter()
