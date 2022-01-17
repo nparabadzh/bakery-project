@@ -102,7 +102,9 @@ const CheckoutPage = () => {
       {cartItems.map((cartItem) => (
         <CheckoutItem key={cartItem.id} cartItem={cartItem} />
       ))}
-      <div className={classes.total}>TOTAL: {total} bgn</div>
+      <div className={classes.total}>
+        Total: {parseFloat(total).toFixed(2)} bgn
+      </div>
       <CustomButton onClick={placeOrder} disabled={total === 0}>
         Place Order
       </CustomButton>

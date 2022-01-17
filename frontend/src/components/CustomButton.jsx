@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
     lineHeight: '50px',
     padding: '0 35px 0 35px',
     fontSize: '15px',
-    backgroundColor: 'black',
+    backgroundColor: 'pink',
     color: 'white',
     textTransform: 'uppercase',
     fontFamily: "'Open Sans Condensed'",

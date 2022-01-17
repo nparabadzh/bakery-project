@@ -11,6 +11,7 @@ import { setCurrentUser } from '../../redux/user/actions';
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setpassword] = useState('');
+  const [error, setError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -25,10 +26,12 @@ const SignUp = () => {
       .then((res) => {
         if (res.data.message === 'logged in') {
           dispatch(setCurrentUser(res.data.user));
+          setError(false);
           navigate('/');
         }
       })
       .catch((error) => {
+        setError(true);
         console.log(error);
       });
   };
@@ -66,12 +69,17 @@ const SignUp = () => {
               aria-describedby="component-helper-text"
             />
           </FormControl>
+          {error && (
+            <span style={{ color: 'red' }}>
+              The email or password is incorrect!
+            </span>
+          )}
           <FormControl>
             <Button
               style={{ marginTop: 20 }}
               disabled={email === '' || password === ''}
               variant="contained"
-              color="primary"
+              color="secondary"
               onClick={signIn}
             >
               Sign in

@@ -47,8 +47,8 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
     fontSize: 20,
     '&:hover': {
-      color: 'yellow',
-      borderBottom: '1px solid white',
+      color: 'pink',
+      // borderBottom: '1px solid white',
     },
   },
   cartIconDiv: {
@@ -60,6 +60,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     cursor: 'pointer',
   },
+  cakeIcon: {
+    color: 'pink',
+  },
 }));
 
 export default function PrimarySearchAppBar() {
@@ -67,6 +70,7 @@ export default function PrimarySearchAppBar() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const currentUser = useSelector((state) => state.user.currentUser);
   const hidden = useSelector((state) => state.cart.hidden);
   const itemCount = useSelector(selectCartItemsCount);
@@ -140,7 +144,7 @@ export default function PrimarySearchAppBar() {
               color="inherit"
               aria-label="open drawer"
             >
-              <CakeIcon />
+              <CakeIcon className={classes.cakeIcon} />
               <Typography className={classes.title} variant="h6" noWrap>
                 Naty&rsquo;s Cakes
               </Typography>

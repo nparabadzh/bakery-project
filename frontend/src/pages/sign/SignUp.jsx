@@ -14,6 +14,7 @@ const SignUp = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [error, setError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -29,13 +30,14 @@ const SignUp = () => {
         delivery_address: deliveryAddress,
       })
       .then((res) => {
-        debugger;
         if (res.statusText === 'Created') {
+          setError(false);
           dispatch(setCurrentUser(res.data));
           navigate('/');
         }
       })
       .catch((error) => {
+        setError(true);
         console.log(error);
       });
   };
@@ -102,6 +104,9 @@ const SignUp = () => {
               aria-describedby="component-helper-text"
             />
           </FormControl>
+          {error && (
+            <span style={{ color: 'red' }}>The email is already taken!</span>
+          )}
           <FormControl>
             <Button
               style={{ marginTop: 20 }}

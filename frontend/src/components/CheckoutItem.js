@@ -47,11 +47,7 @@ const CheckoutItem = ({ cartItem }) => {
   return (
     <div className={classes.checkoutItem}>
       <div className={classes.imageContainer}>
-        <img
-          style={{ width: '100%', height: '150px' }}
-          src={photo}
-          alt="item"
-        />
+        <img style={{ width: '100%', height: 'auto' }} src={photo} alt="item" />
       </div>
       <span className={classes.name}>{name}</span>
       <span className={classes.quantity}>

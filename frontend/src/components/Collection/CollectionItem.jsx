@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
     marginBottom: 30,
     backgroundColor: 'white',
     color: 'black',
-    border: '1px solid black',
+    // border: '1px solid black',
   },
   image: {
     width: '90%',

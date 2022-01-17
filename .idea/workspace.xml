@@ -5,35 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="20d64dbb-6e2c-4d2c-933f-aabe1e1bc8a4" name="Changes" comment="add fe">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/bakery-project.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/api/orders.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/api/orders.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/bakery-project" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/database/database.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/database/database.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/images/cheesecake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/images/chocolate-cake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/images/profiteroles.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/images/red-velvet-cake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/rest/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/rest/app.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/cheesecake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/chocolate-cake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/profiteroles.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/assets/red-velvet-cake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/cheesecake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/chocolate-cake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/profiteroles.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/red-velvet-cake.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Cart/CartItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Cart/CartItem.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Archive.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/CheckoutItem.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/CheckoutItem.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/Collection/CollectionItem.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Collection/CollectionItem.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Collection/CollectionPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Collection/CollectionPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/CustomButton.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/CustomButton.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/checkout/Checkout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/checkout/Checkout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/home/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/home/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/sign/SignIn.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/sign/SignIn.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/sign/SignUp.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/sign/SignUp.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -197,26 +182,5 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/backend/rest/app.go</url>
-          <line>1155</line>
-          <option name="timeStamp" value="48" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/backend/api/orderedGoods.go</url>
-          <line>74</line>
-          <option name="timeStamp" value="49" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/backend/api/orderedGoods.go</url>
-          <line>75</line>
-          <option name="timeStamp" value="50" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
